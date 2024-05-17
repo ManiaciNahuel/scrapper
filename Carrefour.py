@@ -18,6 +18,8 @@ def buscador_carrefour(codigo_barras):
     # Navegar a la página de Carrefour Argentina
     driver.get("https://www.carrefour.com.ar/")
 
+    print("---------- Carrefour ----------")
+
     # Esperar a que el elemento de búsqueda esté presente y visible
     search_box = WebDriverWait(driver, 1).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5"))
@@ -46,6 +48,7 @@ def buscador_carrefour(codigo_barras):
         search_box.send_keys(Keys.RETURN)
 
     # Esperar a que se cargue la página de resultados
+        
     driver.implicitly_wait(5)
 
     try:
@@ -94,7 +97,7 @@ def buscador_carrefour(codigo_barras):
 
 
 
-def leer_codigos_desde_excel(archivo_excel):
+""" def leer_codigos_desde_excel(archivo_excel):
     try:
         # Lee el archivo Excel y obtiene los códigos de barras de la primera columna
         df = pd.read_excel(archivo_excel, header=None)  # Sin encabezados
@@ -107,11 +110,12 @@ def leer_codigos_desde_excel(archivo_excel):
 
 archivo_excel = "codigos.xlsx"  # Ruta de tu archivo Excel
 codigos_barra = leer_codigos_desde_excel(archivo_excel)
-
-
+ """
+""" 
 print("---------- Carrefour ----------")
 for codigo in codigos_barra:
     print(f"Buscando productos para el código de barras: {codigo}")
     buscador_carrefour(codigo)
-    
+    buscador_libertad(codigo)
     print("\n")
+ """

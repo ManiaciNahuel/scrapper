@@ -19,11 +19,13 @@ def buscador_libertad(codigo_barras):
     # Navegar a la página de Hiper Libertad
     driver.get("https://www.hiperlibertad.com.ar/")
     
+    print("---------- Libertad ----------")
+        
+    
     modal_element = WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, "div.hiperlibertad-store-selector-1-x-popupModal.flex.w-100.vh-100.fixed.top-0.left-0.justify-center.items-center"))
     )
     driver.execute_script("arguments[0].style.display = 'none';", modal_element)
-    print("Modal ocultado")
     # Esperar a que el elemento de búsqueda esté presente y visible
     search_box = WebDriverWait(driver, 5).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5"))
@@ -104,7 +106,7 @@ def buscador_libertad(codigo_barras):
 
 
 
-def leer_codigos_desde_excel(archivo_excel):
+""" def leer_codigos_desde_excel(archivo_excel):
     try:
         # Lee el archivo Excel y obtiene los códigos de barras de la primera columna
         df = pd.read_excel(archivo_excel, header=None)  # Sin encabezados
@@ -121,4 +123,4 @@ print("---------- Libertad ----------")
 for codigo in codigos_barra:
     print(f"Buscando productos para el código de barras: {codigo}")
     buscador_libertad(codigo)
-    print("\n")
+    print("\n") """

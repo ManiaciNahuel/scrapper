@@ -5,9 +5,13 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
+from selenium.webdriver.firefox.options import Options
 
-driver = webdriver.Chrome()
 def scrape_farmacia_lider(codigo_barra):
+    options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Firefox(options=options)
+    
     url = f"https://farmaciaslider.com.ar/busqueda?controller=search&s={codigo_barra}"
     response = requests.get(url)
 
@@ -17,6 +21,7 @@ def scrape_farmacia_lider(codigo_barra):
         precios = soup.find_all('div', class_='product-price-and-shipping')
         
         
+        print("---------- Lider ----------")
         if nombreProducto:
             # Itera sobre los resultados para obtener el nombre y el precio de cada producto
             for i in range(len(nombreProducto)):
@@ -35,24 +40,3 @@ def scrape_farmacia_lider(codigo_barra):
         print("Error al obtener la página.")
 
         
-# Función para leer los códigos de barras desde un archivo Excel
-
-def leer_codigos_desde_excel(archivo_excel):
-    try:
-        # Lee el archivo Excel y obtiene los códigos de barras de la primera columna
-        df = pd.read_excel(archivo_excel, header=None)  # Sin encabezados
-        codigos = df.iloc[:, 0].tolist()  # Toma solo la primera columna
-        return codigos
-    except Exception as e:
-        print("Error al leer el archivo Excel:", e)
-        return []
-
-
-# Ejemplo de cómo usar las funciones
-archivo_excel = "codigos.xlsx"  # Ruta de tu archivo Excel
-codigos_barra = leer_codigos_desde_excel(archivo_excel)
-for codigo in codigos_barra:
-    print(f"Buscando productos para el código de barras: {codigo}")
-    print("---------- LIDER ----------")
-    scrape_farmacia_lider(codigo)
-    print("\n")
