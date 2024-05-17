@@ -94,28 +94,3 @@ def buscador_carrefour(codigo_barras):
 
     # Cerrar el navegador
     driver.quit()
-
-
-
-""" def leer_codigos_desde_excel(archivo_excel):
-    try:
-        # Lee el archivo Excel y obtiene los códigos de barras de la primera columna
-        df = pd.read_excel(archivo_excel, header=None)  # Sin encabezados
-        codigos = df.iloc[:, 0].tolist()  # Toma solo la primera columna
-        return codigos
-    except Exception as e:
-        print("Error al leer el archivo Excel:", e)
-        return []
-
-
-archivo_excel = "codigos.xlsx"  # Ruta de tu archivo Excel
-codigos_barra = leer_codigos_desde_excel(archivo_excel)
- """
-""" 
-print("---------- Carrefour ----------")
-for codigo in codigos_barra:
-    print(f"Buscando productos para el código de barras: {codigo}")
-    buscador_carrefour(codigo)
-    buscador_libertad(codigo)
-    print("\n")
- """

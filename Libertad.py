@@ -20,7 +20,7 @@ def buscador_libertad(codigo_barras):
     driver.get("https://www.hiperlibertad.com.ar/")
     
     print("---------- Libertad ----------")
-        
+    
     
     modal_element = WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, "div.hiperlibertad-store-selector-1-x-popupModal.flex.w-100.vh-100.fixed.top-0.left-0.justify-center.items-center"))
@@ -103,24 +103,3 @@ def buscador_libertad(codigo_barras):
 
     # Cerrar el navegador
     driver.quit()
-
-
-
-""" def leer_codigos_desde_excel(archivo_excel):
-    try:
-        # Lee el archivo Excel y obtiene los códigos de barras de la primera columna
-        df = pd.read_excel(archivo_excel, header=None)  # Sin encabezados
-        codigos = df.iloc[:, 0].tolist()  # Toma solo la primera columna
-        return codigos
-    except Exception as e:
-        print("Error al leer el archivo Excel:", e)
-        return []
-
-
-archivo_excel = "codigos.xlsx"  # Ruta de tu archivo Excel
-codigos_barra = leer_codigos_desde_excel(archivo_excel)
-print("---------- Libertad ----------")
-for codigo in codigos_barra:
-    print(f"Buscando productos para el código de barras: {codigo}")
-    buscador_libertad(codigo)
-    print("\n") """
