@@ -104,7 +104,6 @@ def leer_codigos_desde_excel(archivo_excel):
         print("Error al leer el archivo Excel:", e)
         return []
 
-start_time = time.time()
 
 archivo_excel = "codigos.xlsx"  # Ruta de tu archivo Excel
 codigos_barra = leer_codigos_desde_excel(archivo_excel)
@@ -114,12 +113,5 @@ print("---------- Carrefour ----------")
 for codigo in codigos_barra:
     print(f"Buscando productos para el código de barras: {codigo}")
     buscador_carrefour(codigo)
-    print("\n")
     
-# Medir el tiempo de finalización
-end_time = time.time()
-
-# Calcular el tiempo total de ejecución
-total_time = end_time - start_time
-
-print(f"Tiempo total de ejecución: {total_time:.2f} segundos")
+    print("\n")
