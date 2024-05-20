@@ -49,11 +49,11 @@ def buscador_carrefour(codigo_barras):
 
     # Esperar a que se cargue la página de resultados
         
-    driver.implicitly_wait(5)
+    driver.implicitly_wait(3)
 
     try:
         # Esperar a que se cargue el elemento del producto
-        product_element = WebDriverWait(driver, 5).until(
+        product_element = WebDriverWait(driver, 3).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-summary-2-x-productBrand.vtex-product-summary-2-x-brandName.t-body"))
         )
 
