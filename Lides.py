@@ -29,14 +29,22 @@ def scrape_farmacia_lider(codigo_barra):
 
                 # Encuentra los precios actuales y regulares
                 precio_actual = precios[i].find('span', class_='product-price').text.strip()
-                precio_regular = precios[i].find('span', class_='regular-price text-muted').text.strip()
-
+                precio_regular = precios[i].find('span', class_='regular-price text-muted')
+                
                 print(f"Nombre: {nombre}")
-                print(f"Precio actual: {precio_actual}")
-                print(f"Precio regular: {precio_regular}")
+                
+                if precio_regular:
+                    precio_regular_text = precio_regular.text.strip()
+                    print(f"Precio actual: {precio_actual}")
+                    print(f"Precio regular: {precio_regular_text}")
+                else: 
+                    print(f"Precio actual: {precio_actual}")
+                    print(f"No tiene descuento")
+                    
         else:
             print("No se encontraron resultados.")
     else:
         print("Error al obtener la página.")
+
 
         

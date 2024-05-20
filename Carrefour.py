@@ -12,7 +12,6 @@ from selenium.webdriver.firefox.options import Options
 def buscador_carrefour(codigo_barras):
     options = Options()
     options.add_argument("--headless")
-    
     driver = webdriver.Firefox(options=options)
     
     # Navegar a la página de Carrefour Argentina
