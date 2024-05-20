@@ -44,7 +44,7 @@ def buscador_libertad(codigo_barras):
     except TimeoutException:
         print("No tiene descuento")
     except StaleElementReferenceException:
-        print("El elemento de búsqueda se ha vuelto 'stale', volviendo a encontrarlo")
+        #El elemento de búsqueda se ha vuelto 'stale', volviendo a encontrarlo
         search_box = driver.find_element(By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5")
         search_box.clear()
         search_box.send_keys(codigo_barras)
@@ -61,16 +61,6 @@ def buscador_libertad(codigo_barras):
             EC.visibility_of_element_located((By.CSS_SELECTOR, "div.hiperlibertad-store-selector-1-x-popupModal.flex.w-100.vh-100.fixed.top-0.left-0.justify-center.items-center"))
         )
         driver.execute_script("arguments[0].style.display = 'none';", modal_element)
-        # Esperar a que se cargue el elemento del producto
-        product_element = WebDriverWait(driver, 3).until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-summary-2-x-productBrand.vtex-product-summary-2-x-productBrand--defaultShelf-name.vtex-product-summary-2-x-brandName.vtex-product-summary-2-x-brandName--defaultShelf-name.t-body"))
-        )
-
-        # Extraer el texto del elemento del producto
-        product_text = product_element.text
-
-        # Imprimir el texto del producto
-        print("Texto del producto:", product_text)
 
         # Esperar a que se cargue el precio del producto 
         # Selling price es precio actual con descuento incluido si lo tiene
