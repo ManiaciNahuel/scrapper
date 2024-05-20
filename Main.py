@@ -1,7 +1,8 @@
 import pandas as pd
 from Carrefour import buscador_carrefour
+from Farmacity import buscador_farmacity
 from Libertad import buscador_libertad
-from Lides import scrape_farmacia_lider
+from Lider import buscador_lider
 from SuperMami import buscador_superMami
 
 def leer_codigos_desde_excel(archivo_excel):
@@ -24,6 +25,8 @@ for codigo in codigos_barra:
     print("\n")
     buscador_libertad(codigo)
     print("\n")
-    scrape_farmacia_lider(codigo)
+    buscador_lider(codigo)
     print("\n")
     buscador_superMami(codigo)
+    print("\n")
+    buscador_farmacity(codigo)

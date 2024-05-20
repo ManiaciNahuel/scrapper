@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 
 from selenium.webdriver.firefox.options import Options
 
-def scrape_farmacia_lider(codigo_barra):
+def buscador_lider(codigo_barra):
     options = Options()
     options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
