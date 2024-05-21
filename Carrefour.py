@@ -17,8 +17,6 @@ def buscador_carrefour(codigo_barras):
     salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
     driver.get("https://www.carrefour.com.ar/")
 
-    print("---------- Carrefour ----------")
-
     time.sleep(2)
     search_box = WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5"))
@@ -52,21 +50,19 @@ def buscador_carrefour(codigo_barras):
             if price_element:
                 price = price_element.get_attribute("textContent")
                 old_price = old_price_element.get_attribute("textContent")
-                print("Precio del producto actual:", price)
-                print("Precio del producto de lista:", old_price)
                 salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": old_price}
                 
                 
         except TimeoutException:
             price = price_element.get_attribute("textContent")
-            print("Precio del producto actual:", price)
-            print("No tiene descuento")
             salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": price}
             
             
         
     except TimeoutException:
-        print("Producto no encontrado")
-        
-    return salida
+        driver.quit()
+        return salida
+            
     driver.quit()
+    return salida
+    

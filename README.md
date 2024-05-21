@@ -7,7 +7,7 @@ A gran escala la aplicacion abre pagina por pagina, busca el producto por codigo
 
 ## Modo de uso
 
-Para usar la aplicacion lo primero que hay que hacer es un excel con todos los codigos de barra que necesites buscar precios. Los EAN tienen que estar en la primera columna y uno por fila. 
+Para usar la aplicacion lo primero que hay que hacer es un excel con todos los codigos de barra y nombre de los productos que necesites buscar precios. Los EAN tienen que estar en la primera columna y los nombres en la segunda columna. 
 
 ##
 ## Para instalar (devs)

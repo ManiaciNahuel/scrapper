@@ -12,6 +12,8 @@ def buscador_lider(codigo_barra):
     options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
     
+    salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
+    
     url = f"https://farmaciaslider.com.ar/busqueda?controller=search&s={codigo_barra}"
     response = requests.get(url)
 
@@ -21,7 +23,6 @@ def buscador_lider(codigo_barra):
         precios = soup.find_all('div', class_='product-price-and-shipping')
         
         
-        print("---------- Lider ----------")
         if nombreProducto:
             # Itera sobre los resultados para obtener el nombre y el precio de cada producto
             for i in range(len(nombreProducto)):
@@ -37,14 +38,25 @@ def buscador_lider(codigo_barra):
                     precio_regular_text = precio_regular.text.strip()
                     print(f"Precio actual: {precio_actual}")
                     print(f"Precio regular: {precio_regular_text}")
+                    salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_regular_text}
+                    
                 else: 
-                    print(f"Precio actual: {precio_actual}")
-                    print(f"No tiene descuento")
+                    """  print(f"Precio actual: {precio_actual}")
+                    print(f"No tiene descuento") """
+                    salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_actual}
+                    
                     
         else:
-            print("No se encontraron resultados.")
+            """ print("No se encontraron resultados.") """
+            driver.quit()
+            return salida
     else:
-        print("Error al obtener la página.")
+        """  print("Error al obtener la página.") """
+        driver.quit()
+        return salida
+        
+    driver.quit()
+    return salida
 
 
         

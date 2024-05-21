@@ -16,10 +16,10 @@ def buscador_libertad(codigo_barras):
     
     driver = webdriver.Firefox(options=options)
     
+    salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
+    
     # Navegar a la página de Hiper Libertad
     driver.get("https://www.hiperlibertad.com.ar/")
-    
-    print("---------- Libertad ----------")
     
     
     modal_element = WebDriverWait(driver, 3).until(
@@ -79,17 +79,20 @@ def buscador_libertad(codigo_barras):
             old_price = old_price_element.get_attribute("textContent")
             
             # Imprimir el precio del producto
-            print("Precio del producto actual:", price)
-            print("Precio del producto de lista:", old_price)
+            """ print("Precio del producto actual:", price)
+            print("Precio del producto de lista:", old_price) """
+            salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": old_price}
             
         except TimeoutException:
             # Si no se encuentra el precio sin descuento, imprimir solo el precio actual
             price = price_element.get_attribute("textContent")
-            print("Precio del producto actual:", price)
-            print("No tiene descuento")
+            """ print("Precio del producto actual:", price)
+            print("No tiene descuento") """
+            salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": price}
+            
         
     except TimeoutException:
-        print("Producto no encontrado")
-
-    # Cerrar el navegador
+        driver.quit()
+        return salida
     driver.quit()
+    return salida

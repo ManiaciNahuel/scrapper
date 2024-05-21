@@ -5,7 +5,6 @@ from Libertad import buscador_libertad
 from Lider import buscador_lider
 from SuperMami import buscador_superMami
 
-
 def leer_codigos_desde_excel(archivo_excel):
     try:
         df = pd.read_excel(archivo_excel, header=None)
@@ -16,25 +15,49 @@ def leer_codigos_desde_excel(archivo_excel):
         print("Error al leer el archivo Excel:", e)
         return [], []
 
-archivo_excel = "codigos.xlsx"
+archivo_excel = "codigos1.xlsx"
 codigos_barra, nombres_productos = leer_codigos_desde_excel(archivo_excel)
 
 # Crear un DataFrame vacío
-df_resultados = pd.DataFrame(columns=["Código de Barras", "Sitio", "Producto", "Precio Actual", "Precio Anterior"])
+df_resultados = pd.DataFrame(columns=["Código de Barras", "Producto", "Sitio", "Precio Actual", "Precio Anterior"])
 
 print("---------- Cargando ----------")
 for codigo, nombre_producto in zip(codigos_barra, nombres_productos):
-    """ print("\n")
-    print(f"Buscando productos para el código de barras: {codigo}") """
+    print("\n")
+    print(f"Buscando productos para el código de barras: {codigo}")
     
-    # Buscar en Carrefour
+    # Buscadores
     resultado_carrefour = buscador_carrefour(codigo)
     if resultado_carrefour["producto"]:
         df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Carrefour", resultado_carrefour["precio_actual"], resultado_carrefour["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
     
+    resultado_libertad = buscador_libertad(codigo)
+    if resultado_libertad["producto"]:
+        df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Libertad", resultado_libertad["precio_actual"], resultado_libertad["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+    
+    resultado_superMami = buscador_superMami(codigo)
+    if resultado_superMami["producto"]:
+        df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Super Mami", resultado_superMami["precio_actual"], resultado_superMami["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+    
+    resultado_lider = buscador_lider(codigo)
+    if resultado_lider["producto"]:
+        df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Lider", resultado_lider["precio_actual"], resultado_lider["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+    
+    resultado_farmacity = buscador_farmacity(codigo)
+    if resultado_farmacity["producto"]:
+        df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Farmacity", resultado_farmacity["precio_actual"], resultado_farmacity["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+
+# Pivotear el DataFrame para tener una fila por código de barras
+df_resultados_pivot = df_resultados.pivot(index=["Código de Barras", "Producto"], columns="Sitio", values=["Precio Actual", "Precio Anterior"])
+
+# Renombrar las columnas con el nombre del comercio y el tipo de precio
+df_resultados_pivot.columns = [f"{col[1]} {col[0]}" if col[1] != '' else col[0] for col in df_resultados_pivot.columns]
+
+# Resetear el índice para que "Código de Barras" y "Producto" sean columnas normales
+df_resultados_pivot.reset_index(inplace=True)
 
 # Mostrar el DataFrame con los resultados
-print(df_resultados)
+print(df_resultados_pivot)
 
-# Guardar el DataFrame en un archivo CSV
-df_resultados.to_csv("resultados_busqueda.csv", index=False)
+# Guardar el DataFrame en un archivo Excel
+df_resultados_pivot.to_excel("resultados_busqueda.xlsx", index=False)

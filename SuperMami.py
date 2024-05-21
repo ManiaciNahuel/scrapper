@@ -14,12 +14,11 @@ def buscador_superMami(codigo_barras):
     options.add_argument("--headless")
     
     driver = webdriver.Firefox(options=options)
+    salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
     
     try:
         # Navegar a la página de Super Mami Argentina
         driver.get("https://www.supermami.com.ar/super/home")
-
-        print("---------- Super Mami ----------")
 
         boton = WebDriverWait(driver, 5).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, "button.btn.btn-nobg.getFullSearch"))
@@ -48,22 +47,32 @@ def buscador_superMami(codigo_barras):
                 precio_actual = precios[0].text.strip()
                 precio_anterior = precios[1].text.strip()
 
-                print("Precio actual del producto buscado: " + precio_actual)
-                print("Precio anterior del producto buscado: " + precio_anterior)
+                """ print("Precio actual del producto buscado: " + precio_actual)
+                print("Precio anterior del producto buscado: " + precio_anterior) """
+                salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_anterior}
+
             elif len(precios) >= 1:
                 precio_actual = precios[0].text.strip()
 
-                print("Precio actual del producto buscado: " + precio_actual)
-                print("El producto no tiene descuentos")
+                """ print("Precio actual del producto buscado: " + precio_actual)
+                print("El producto no tiene descuentos") """
+                salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_actual}
+                
             else:
-                print("No se encontraron precios para el producto buscado.")
+                """ print("No se encontraron precios para el producto buscado.") """
+                driver.quit()
+                return salida
 
         except:
-            print("Producto no encontrado")
+            """ print("Producto no encontrado") """
+            driver.quit()
+            return salida
 
     except Exception as e:
-        print("Error al conectar con la página web:", e)
-        print("Asegúrate de tener conexión a Internet y que la URL sea correcta.")
+        """ print("Error al conectar con la página web:", e)
+        print("Asegúrate de tener conexión a Internet y que la URL sea correcta.") """
+        driver.quit()
+        return salida
 
-    # Cerrar el navegador
     driver.quit()
+    return salida
