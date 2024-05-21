@@ -21,7 +21,6 @@ codigos_barra, nombres_productos = leer_codigos_desde_excel(archivo_excel)
 # Crear un DataFrame vacío
 df_resultados = pd.DataFrame(columns=["Código de Barras", "Producto", "Sitio", "Precio Actual", "Precio Anterior"])
 
-print("---------- Cargando ----------")
 for codigo, nombre_producto in zip(codigos_barra, nombres_productos):
     print("\n")
     print(f"Buscando productos para el código de barras: {codigo}")
@@ -48,13 +47,26 @@ for codigo, nombre_producto in zip(codigos_barra, nombres_productos):
         df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Farmacity", resultado_farmacity["precio_actual"], resultado_farmacity["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
 
 # Pivotear el DataFrame para tener una fila por código de barras
-df_resultados_pivot = df_resultados.pivot(index=["Código de Barras", "Producto"], columns="Sitio", values=["Precio Actual", "Precio Anterior"])
+df_resultados_pivot = df_resultados.pivot(index=["Código de Barras", "Producto"], columns="Sitio", values=["Precio", "Precio s/ Dto"])
 
 # Renombrar las columnas con el nombre del comercio y el tipo de precio
 df_resultados_pivot.columns = [f"{col[1]} {col[0]}" if col[1] != '' else col[0] for col in df_resultados_pivot.columns]
 
 # Resetear el índice para que "Código de Barras" y "Producto" sean columnas normales
 df_resultados_pivot.reset_index(inplace=True)
+
+# Especificar el orden deseado de las columnas
+column_order = [
+    "Código de Barras", "Producto", 
+    "Carrefour Precio", "Carrefour Precio s/ Dto", 
+    "Farmacity Precio", "Farmacity Precio s/ Dto", 
+    "Libertad Precio", "Libertad Precio s/ Dto", 
+    "Lider Precio", "Lider Precio s/ Dto", 
+    "Super Mami Precio", "Super Mami Precio s/ Dto"
+]
+
+# Reordenar las columnas
+df_resultados_pivot = df_resultados_pivot[column_order]
 
 # Mostrar el DataFrame con los resultados
 print(df_resultados_pivot)
