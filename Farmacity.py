@@ -28,7 +28,7 @@ def buscador_farmacity(codigo_barra):
         campo_busqueda.send_keys(codigo_barra)
         campo_busqueda.send_keys(Keys.RETURN)
 
-        time.sleep(3)  
+        time.sleep(5)  
         
         try:
             not_found_element = driver.find_elements(By.CLASS_NAME, "farmacityar-store-components-1-x-notFoundText")
@@ -45,7 +45,9 @@ def buscador_farmacity(codigo_barra):
                 driver.quit()
                 return salida
             else:
-                precio_actual = WebDriverWait(driver, 10).until(
+                time.sleep(3)  
+                
+                precio_actual = WebDriverWait(driver, 5).until(
                     EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-price-1-x-sellingPriceValue"))
                 )
             
