@@ -32,26 +32,19 @@ def buscador_lider(codigo_barra):
                 precio_actual = precios[i].find('span', class_='product-price').text.strip()
                 precio_regular = precios[i].find('span', class_='regular-price text-muted')
                 
-                print(f"Nombre: {nombre}")
-                
                 if precio_regular:
                     precio_regular_text = precio_regular.text.strip()
-                    print(f"Precio actual: {precio_actual}")
-                    print(f"Precio regular: {precio_regular_text}")
                     salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_regular_text}
                     
                 else: 
-                    """  print(f"Precio actual: {precio_actual}")
-                    print(f"No tiene descuento") """
                     salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_actual}
                     
                     
         else:
-            """ print("No se encontraron resultados.") """
             driver.quit()
             return salida
     else:
-        """  print("Error al obtener la página.") """
+
         driver.quit()
         return salida
         
