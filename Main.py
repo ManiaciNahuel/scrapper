@@ -1,13 +1,12 @@
 import pandas as pd
 from tkinter import Tk, Button, Label, filedialog, Frame, N, S, E, W
-from tkinter.ttk import Progressbar, Style
+from tkinter.ttk import Style
 from Carrefour import buscador_carrefour
 from Farmacity import buscador_farmacity
 from Ferniplast import buscador_ferniplast
 from Libertad import buscador_libertad
 from Lider import buscador_lider
 from SuperMami import buscador_superMami
-import time
 
 def leer_codigos_desde_excel(archivo_excel):
     try:
@@ -24,21 +23,14 @@ def seleccionar_archivo():
     if archivo_excel:
         procesar_archivo(archivo_excel)
 
-""" def actualizar_progreso(progreso, max_valor):
-    barra_progreso["value"] = progreso
-    barra_progreso["maximum"] = max_valor
-    root.update_idletasks() """
-
 def procesar_archivo(archivo_excel):
     codigos_barra, nombres_productos = leer_codigos_desde_excel(archivo_excel)
     
     # Crear un DataFrame vacío
     df_resultados = pd.DataFrame(columns=["Código de Barras", "Producto", "Sitio", "Precio", "Precio s/ Dto"])
-    max_valor = len(codigos_barra)
+
     
-    tiempo_inicio = time.time()
-    
-    for progreso, (codigo, nombre_producto) in enumerate(zip(codigos_barra, nombres_productos), 1):
+    for (codigo, nombre_producto) in enumerate(zip(codigos_barra, nombres_productos), 1):
         print(f"Buscando productos para el código de barras: {codigo}")
         
         # Buscadores
@@ -66,10 +58,7 @@ def procesar_archivo(archivo_excel):
         if resultado_ferniplast["producto"]:
             df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Ferniplast", resultado_ferniplast["precio_actual"], resultado_ferniplast["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
 
-        """ actualizar_progreso(progreso, max_valor) """
-
-    tiempo_total = time.time() - tiempo_inicio
-    print(f"Tiempo total de ejecución: {tiempo_total} segundos")
+        
     # Pivotear el DataFrame para tener una fila por código de barras
     df_resultados_pivot = df_resultados.pivot(index=["Código de Barras", "Producto"], columns="Sitio", values=["Precio", "Precio s/ Dto"])
 
@@ -128,9 +117,5 @@ label.grid(row=0, column=0, columnspan=2, pady=20)
 # Botón para cargar archivo
 boton = Button(frame, text="Cargar archivo", command=seleccionar_archivo)
 boton.grid(row=1, column=0, columnspan=2, pady=10)
-
-""" # Barra de progreso
-barra_progreso = Progressbar(frame, orient="horizontal", mode="determinate")
-barra_progreso.grid(row=2, column=0, columnspan=2, pady=20, sticky=(E, W)) """
 
 root.mainloop()
