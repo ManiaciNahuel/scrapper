@@ -28,9 +28,7 @@ def procesar_archivo(archivo_excel):
     
     # Crear un DataFrame vacío
     df_resultados = pd.DataFrame(columns=["Código de Barras", "Producto", "Sitio", "Precio", "Precio s/ Dto"])
-
-    
-    for (codigo, nombre_producto) in enumerate(zip(codigos_barra, nombres_productos), 1):
+    for i, (codigo, nombre_producto) in enumerate(zip(codigos_barra, nombres_productos), 1):
         print(f"Buscando productos para el código de barras: {codigo}")
         
         # Buscadores
@@ -58,7 +56,6 @@ def procesar_archivo(archivo_excel):
         if resultado_ferniplast["producto"]:
             df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Ferniplast", resultado_ferniplast["precio_actual"], resultado_ferniplast["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
 
-        
     # Pivotear el DataFrame para tener una fila por código de barras
     df_resultados_pivot = df_resultados.pivot(index=["Código de Barras", "Producto"], columns="Sitio", values=["Precio", "Precio s/ Dto"])
 
@@ -104,7 +101,6 @@ style = Style(root)
 style.theme_use('clam')
 style.configure("TButton", font=("Helvetica", 12), padding=10)
 style.configure("TLabel", font=("Helvetica", 12))
-style.configure("TProgressbar", thickness=20)
 
 # Marco para centrar contenido
 frame = Frame(root)
