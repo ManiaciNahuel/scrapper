@@ -2,23 +2,28 @@ import pandas as pd
 from tkinter import Tk, Button, Label, filedialog, Frame, N, S, E, W
 from tkinter.ttk import Style
 import time
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException, StaleElementReferenceException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
-import time
 from selenium.webdriver.common.keys import Keys
-import pandas as pd
 from selenium.webdriver.firefox.options import Options
 
+# Definición de los sitios de búsqueda y sus funciones
+sitios_busqueda = {
+    "Carrefour": False,
+    "Farmacity": False,
+    "Libertad": False,
+    "Super Mami": False,
+    "Lider": False,
+    "Ferniplast": False,
+    "Disco": False
+}
 
 def buscador_superMami(codigo_barras):
     options = Options()
@@ -105,80 +110,163 @@ def buscador_lider(codigo_barra):
     driver.quit()
     return salida
 
+def buscador_disco(codigo_barra):
+    """ options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Firefox(options=options)"""
+    driver = webdriver.Firefox()
+    
+    salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
+
+    try:
+        # Navegar a la página de Disco con el código de barras
+        url = f"https://www.disco.com.ar/{codigo_barra}?_q={codigo_barra}&map=ft"
+        driver.get(url)
+
+        # Paso 2: Click en "Seleccioná el tipo de entrega"
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a.vtex-rich-text-0-x-link--sucursal"))
+        ).click()
+
+        time.sleep(3)
+        
+         # Paso 2: Esperar a que el modal cargue el campo de correo electrónico
+        email_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.ph5"))
+        )
+
+        # Paso 3: Hacer clic en el input de correo electrónico antes de escribir
+        email_input.click()  # Enfocar el campo de correo
+
+        # Paso 4: Escribir el correo electrónico
+        email_input.send_keys("mail@gmail.com")
+        print("Correo ingresado con éxito.")
+
+        # Paso 5: Hacer clic en el botón "Enviar"
+        enviar_boton = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.vtex-button.bw1.ba"))
+        )
+        enviar_boton.click()
+        print("Botón de enviar clickeado con éxito.")
+        
+        
+        # Paso 5: Presionar el botón para seleccionar provincia y tienda
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.vtex-button.bw1.ba"))
+        ).click()
+
+        # Paso 6: Seleccionar "CORDOBA" como provincia
+        provincia_select = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "select"))
+        )
+        provincia_select.send_keys("CORDOBA")
+        provincia_select.send_keys(Keys.RETURN)
+
+        # Paso 7: Seleccionar "Disco Villa Allende" como tienda
+        tienda_select = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "select"))
+        )
+        tienda_select.send_keys("Disco Villa Allende")
+        tienda_select.send_keys(Keys.RETURN)
+
+        # Paso 8: Confirmar la tienda
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.vtex-button.bw1.ba"))
+        ).click()
+
+        # Esperar unos segundos para que los precios se actualicen
+        time.sleep(10)
+
+        # Extraer el precio actual con descuento
+        try:
+            precio_actual_element = driver.find_element(By.ID, "priceContainer")
+            precio_actual = precio_actual_element.text.strip()
+            print(f"Precio actual: {precio_actual}")
+        except Exception as e:
+            print(f"No se encontró el precio actual: {e}")
+            precio_actual = "Not found"
+
+        # Extraer el precio anterior (si existe)
+        try:
+            precio_anterior_element = driver.find_element(By.CSS_SELECTOR, "div.discoargentina-store-theme-2t-mVsKNpKjmCAEM_AMCQH")
+            precio_anterior = precio_anterior_element.text.strip()
+        except Exception as e:
+            print(f"No se encontró el precio anterior: {e}")
+            precio_anterior = precio_actual  # Si no hay precio anterior, usar el precio actual como fallback
+
+        salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_anterior}
+    
+    except Exception as e:
+        print(f"Error en buscador_disco: {e}")
+        salida = {"producto": "Producto", "precio_actual": "error", "precio_anterior": "error"}
+
+    finally:
+        driver.quit()
+
+    return salida
+
 
 def buscador_libertad(codigo_barras):
-    # Options con --headless es para que no se vea la pestaña abierta
     options = Options()
     options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
     salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
 
-    # Navegar a la página de Hiper Libertad
-    driver.get("https://www.hiperlibertad.com.ar/")
-    modal_element = WebDriverWait(driver, 5).until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, "div.hiperlibertad-store-selector-1-x-popupModal.flex.w-100.vh-100.fixed.top-0.left-0.justify-center.items-center"))
-    )
-    driver.execute_script("arguments[0].style.display = 'none';", modal_element)
-
-    # Esperar a que el elemento de búsqueda esté presente y visible
-    search_box = WebDriverWait(driver, 5).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5"))
-    )
-
     try:
-        search_box.clear()
-        # Ingresar el código de barras
-        search_box.send_keys(codigo_barras)
-        # Pequeña pausa antes de enviar la búsqueda
-        time.sleep(2)
-        # Enviar la búsqueda presionando Enter
-        search_box.send_keys(Keys.RETURN)
-    except TimeoutException:
-        print("No tiene descuento")
-    except StaleElementReferenceException:
-        # El elemento de búsqueda se ha vuelto'stale', volviendo a encontrarlo
-        search_box = driver.find_element(By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5")
-        search_box.clear()
-        search_box.send_keys(codigo_barras)
-        time.sleep(2)
-        # Enviar la búsqueda presionando Enter
-        search_box.send_keys(Keys.RETURN)
+        driver.get("https://www.hiperlibertad.com.ar/")
 
-    # Esperar a que se cargue la página de resultados
-    driver.implicitly_wait(4)
-
-    try:
-        modal_element = WebDriverWait(driver, 4).until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, "div.hiperlibertad-store-selector-1-x-popupModal.flex.w-100.vh-100.fixed.top-0.left-0.justify-center.items-center"))
-        )
-        driver.execute_script("arguments[0].style.display = 'none';", modal_element)
-
-        # Esperar a que se cargue el precio del producto
-        # Selling price es precio actual con descuento incluido si lo tiene
-        price_element = WebDriverWait(driver, 3).until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-price-1-x-sellingPriceValue"))
-        )
-
+        # Manejar modal si es necesario
         try:
-            # List price es precio sin descuento
-            old_price_element = WebDriverWait(driver, 3).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-price-1-x-listPrice"))
+            modal_element = WebDriverWait(driver, 5).until(
+                EC.visibility_of_element_located((By.CSS_SELECTOR, "div.hiperlibertad-store-selector-1-x-popupModal.flex.w-100.vh-100.fixed.top-0.left-0.justify-center.items-center"))
             )
-            # Extraer el precio completo utilizando el atributo textContent
-            price = price_element.get_attribute("textContent")
-            old_price = old_price_element.get_attribute("textContent")
-            salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": old_price}
+            driver.execute_script("arguments[0].style.display = 'none';", modal_element)
         except TimeoutException:
-            # Si no se encuentra el precio sin descuento, imprimir solo el precio actual
-            price = price_element.get_attribute("textContent")
-            salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": price}
-    
+            pass  # No se encontró el modal, continuar
+
+        # Buscar el cuadro de búsqueda
+        search_box = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5"))
+        )
+
+        search_box.clear()
+        search_box.send_keys(codigo_barras)
+        time.sleep(2)
+        search_box.send_keys(Keys.RETURN)
+
+        # Esperar a que se cargue la página de resultados
+        driver.implicitly_wait(4)
+
+        # Verificar si se encontraron resultados
+        results_elements = driver.find_elements(By.CSS_SELECTOR, "div.vtex-search-result-3-x-notFound--layout")
+        if results_elements:
+            # No se encontraron resultados
+            salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
+        else:
+            # Esperar a que se cargue el precio del producto
+            try:
+                price_element = WebDriverWait(driver, 3).until(
+                    EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-price-1-x-sellingPriceValue"))
+                )
+                price = price_element.get_attribute("textContent").strip()
+
+                try:
+                    old_price_element = WebDriverWait(driver, 3).until(
+                        EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-price-1-x-listPrice"))
+                    )
+                    old_price = old_price_element.get_attribute("textContent").strip()
+                except TimeoutException:
+                    old_price = price  # Si no hay precio anterior, usar el mismo que el actual
+
+                salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": old_price}
+            except (TimeoutException, NoSuchElementException):
+                salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
+
     except Exception as e:
         print(f"Error en buscador_libertad: {e}")
+    finally:
         driver.quit()
-        return {"producto": "Producto", "precio_actual": "error", "precio_anterior": "error"}
 
-    driver.quit()
     return salida
  
   
@@ -247,6 +335,13 @@ def buscador_ferniplast(codigo_barra):
     try:
         # Navegar a la página de Ferniplast
         driver.get("https://www.ferniplast.com/")
+        
+        # Presionar ESC para cerrar el modal
+        body = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        body.send_keys(Keys.ESCAPE)
+        
         campo_busqueda = WebDriverWait(driver, 5).until(
             EC.visibility_of_element_located((By.ID, "downshift-0-input"))
         )
@@ -355,7 +450,7 @@ def buscador_carrefour(codigo_barras):
 
     driver.quit()
     return salida
-    
+
 
 def leer_codigos_desde_excel(archivo_excel):
     try:
@@ -384,7 +479,7 @@ def procesar_archivo(archivo_excel):
         print(f"Buscando productos para el código de barras: {codigo}")
         
         # Buscadores
-        resultado_carrefour = buscador_carrefour(codigo)
+        """ resultado_carrefour = buscador_carrefour(codigo)
         if resultado_carrefour["producto"]:
             df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Carrefour", resultado_carrefour["precio_actual"], resultado_carrefour["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
         
@@ -407,6 +502,10 @@ def procesar_archivo(archivo_excel):
         resultado_ferniplast = buscador_ferniplast(codigo)
         if resultado_ferniplast["producto"]:
             df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Ferniplast", resultado_ferniplast["precio_actual"], resultado_ferniplast["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+ """
+        resultado_disco = buscador_disco(codigo)
+        if resultado_disco["producto"]:
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Disco", resultado_disco["precio_actual"], resultado_disco["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
 
 
     tiempo_total = time.time() - tiempo_inicio
@@ -423,13 +522,15 @@ def procesar_archivo(archivo_excel):
     # Especificar el orden deseado de las columnas
     column_order = [
         "Código de Barras", "Producto", 
-        "Carrefour Precio", "Carrefour Precio s/ Dto", 
+        "Disco Precio", "Disco Precio s/ Dto"
+    ]
+    """ "Carrefour Precio", "Carrefour Precio s/ Dto", 
         "Farmacity Precio", "Farmacity Precio s/ Dto", 
         "Libertad Precio", "Libertad Precio s/ Dto", 
-        "Lider Precio", "Lider Precio s/ Dto", 
         "Super Mami Precio", "Super Mami Precio s/ Dto",
-        "Ferniplast Precio", "Ferniplast Precio s/ Dto"
-    ]
+        "Lider Precio", "Lider Precio s/ Dto",
+        "Ferniplast Precio", "Ferniplast Precio s/ Dto", """
+
 
     # Reordenar las columnas
     df_resultados_pivot = df_resultados_pivot[column_order]
