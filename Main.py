@@ -1,6 +1,6 @@
 import pandas as pd
 from tkinter import Tk, Button, Label, filedialog, Frame, N, S, E, W
-from tkinter.ttk import Style
+from tkinter.ttk import Progressbar, Style
 from Carrefour import buscador_carrefour
 from Farmacity import buscador_farmacity
 from Ferniplast import buscador_ferniplast
@@ -32,7 +32,7 @@ def procesar_archivo(archivo_excel):
     
     tiempo_inicio = time.time()
     
-    for (codigo, nombre_producto) in enumerate(zip(codigos_barra, nombres_productos), 1):
+    for i, (codigo, nombre_producto) in enumerate(zip(codigos_barra, nombres_productos), 1):
         print(f"Buscando productos para el código de barras: {codigo}")
         
         # Buscadores
