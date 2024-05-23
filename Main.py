@@ -3,6 +3,7 @@ from tkinter import Tk, Button, Label, filedialog, Frame, N, S, E, W
 from tkinter.ttk import Progressbar, Style
 from Carrefour import buscador_carrefour
 from Farmacity import buscador_farmacity
+from Ferniplast import buscador_ferniplast
 from Libertad import buscador_libertad
 from Lider import buscador_lider
 from SuperMami import buscador_superMami
@@ -61,6 +62,10 @@ def procesar_archivo(archivo_excel):
         if resultado_farmacity["producto"]:
             df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Farmacity", resultado_farmacity["precio_actual"], resultado_farmacity["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
 
+        resultado_ferniplast = buscador_ferniplast(codigo)
+        if resultado_ferniplast["producto"]:
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Ferniplast", resultado_ferniplast["precio_actual"], resultado_ferniplast["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+
         """ actualizar_progreso(progreso, max_valor) """
 
     tiempo_total = time.time() - tiempo_inicio
@@ -81,7 +86,8 @@ def procesar_archivo(archivo_excel):
         "Farmacity Precio", "Farmacity Precio s/ Dto", 
         "Libertad Precio", "Libertad Precio s/ Dto", 
         "Lider Precio", "Lider Precio s/ Dto", 
-        "Super Mami Precio", "Super Mami Precio s/ Dto"
+        "Super Mami Precio", "Super Mami Precio s/ Dto",
+        "Ferniplast Precio", "Ferniplast Precio s/ Dto"
     ]
 
     # Reordenar las columnas

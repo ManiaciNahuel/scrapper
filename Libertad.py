@@ -82,6 +82,8 @@ def buscador_libertad(codigo_barras):
             """ print("Precio del producto actual:", price)
             print("Precio del producto de lista:", old_price) """
             salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": old_price}
+            driver.quit()
+            return salida
             
         except TimeoutException:
             # Si no se encuentra el precio sin descuento, imprimir solo el precio actual
@@ -89,10 +91,11 @@ def buscador_libertad(codigo_barras):
             """ print("Precio del producto actual:", price)
             print("No tiene descuento") """
             salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": price}
+            driver.quit()
+            return salida
             
         
     except TimeoutException:
         driver.quit()
         return salida
-    driver.quit()
-    return salida
+  

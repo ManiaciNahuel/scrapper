@@ -51,12 +51,14 @@ def buscador_carrefour(codigo_barras):
                 price = price_element.get_attribute("textContent")
                 old_price = old_price_element.get_attribute("textContent")
                 salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": old_price}
-                
+                driver.quit()
+                return salida
                 
         except TimeoutException:
             price = price_element.get_attribute("textContent")
             salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": price}
-            
+            driver.quit()
+            return salida
             
         
     except TimeoutException:

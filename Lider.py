@@ -26,8 +26,7 @@ def buscador_lider(codigo_barra):
         if nombreProducto:
             # Itera sobre los resultados para obtener el nombre y el precio de cada producto
             for i in range(len(nombreProducto)):
-                nombre = nombreProducto[i].text.strip()
-
+                
                 # Encuentra los precios actuales y regulares
                 precio_actual = precios[i].find('span', class_='product-price').text.strip()
                 precio_regular = precios[i].find('span', class_='regular-price text-muted')
@@ -35,10 +34,12 @@ def buscador_lider(codigo_barra):
                 if precio_regular:
                     precio_regular_text = precio_regular.text.strip()
                     salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_regular_text}
-                    
+                    driver.quit()
+                    return salida
                 else: 
                     salida = {"producto": "Producto", "precio_actual": precio_actual, "precio_anterior": precio_actual}
-                    
+                    driver.quit()
+                    return salida
                     
         else:
             driver.quit()
