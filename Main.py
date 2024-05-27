@@ -1,6 +1,6 @@
 import pandas as pd
 from tkinter import Tk, Button, Label, filedialog, Frame, N, S, E, W
-from tkinter.ttk import Progressbar, Style
+from tkinter.ttk import Style
 from Carrefour import buscador_carrefour
 from Farmacity import buscador_farmacity
 from Ferniplast import buscador_ferniplast
