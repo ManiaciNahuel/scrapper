@@ -43,7 +43,7 @@ def buscador_superMami(codigo_barras):
 
         try:
             # Esperar a que se carguen los resultados de búsqueda
-            WebDriverWait(driver, 2).until(
+            WebDriverWait(driver, 3).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "div.precio-unidad"))
             )
             # Encontrar los elementos que contienen los precios del producto buscado
@@ -115,13 +115,13 @@ def buscador_libertad(codigo_barras):
 
     # Navegar a la página de Hiper Libertad
     driver.get("https://www.hiperlibertad.com.ar/")
-    modal_element = WebDriverWait(driver, 2).until(
+    modal_element = WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, "div.hiperlibertad-store-selector-1-x-popupModal.flex.w-100.vh-100.fixed.top-0.left-0.justify-center.items-center"))
     )
     driver.execute_script("arguments[0].style.display = 'none';", modal_element)
 
     # Esperar a que el elemento de búsqueda esté presente y visible
-    search_box = WebDriverWait(driver, 2).until(
+    search_box = WebDriverWait(driver, 5).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5"))
     )
 
@@ -130,7 +130,7 @@ def buscador_libertad(codigo_barras):
         # Ingresar el código de barras
         search_box.send_keys(codigo_barras)
         # Pequeña pausa antes de enviar la búsqueda
-        time.sleep(1)
+        time.sleep(2)
         # Enviar la búsqueda presionando Enter
         search_box.send_keys(Keys.RETURN)
     except TimeoutException:
@@ -140,7 +140,7 @@ def buscador_libertad(codigo_barras):
         search_box = driver.find_element(By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5")
         search_box.clear()
         search_box.send_keys(codigo_barras)
-        time.sleep(1)
+        time.sleep(2)
         # Enviar la búsqueda presionando Enter
         search_box.send_keys(Keys.RETURN)
 
@@ -148,20 +148,20 @@ def buscador_libertad(codigo_barras):
     driver.implicitly_wait(4)
 
     try:
-        modal_element = WebDriverWait(driver, 2).until(
+        modal_element = WebDriverWait(driver, 4).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, "div.hiperlibertad-store-selector-1-x-popupModal.flex.w-100.vh-100.fixed.top-0.left-0.justify-center.items-center"))
         )
         driver.execute_script("arguments[0].style.display = 'none';", modal_element)
 
         # Esperar a que se cargue el precio del producto
         # Selling price es precio actual con descuento incluido si lo tiene
-        price_element = WebDriverWait(driver, 1).until(
+        price_element = WebDriverWait(driver, 3).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-price-1-x-sellingPriceValue"))
         )
 
         try:
             # List price es precio sin descuento
-            old_price_element = WebDriverWait(driver, 1).until(
+            old_price_element = WebDriverWait(driver, 3).until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-price-1-x-listPrice"))
             )
             # Extraer el precio completo utilizando el atributo textContent
@@ -264,7 +264,7 @@ def buscador_ferniplast(codigo_barra):
                 pass
             else:
                 time.sleep(3)
-                precio_actual = WebDriverWait(driver, 4).until(
+                precio_actual = WebDriverWait(driver, 5).until(
                     EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-store-components-3-x-sellingPriceValue.vtex-product-summary-2-x-sellingPrice.vtex-product-summary-2-x-sellingPrice--product-box"))
                 )
                 precio_completo = precio_actual.text
@@ -298,7 +298,7 @@ def buscador_carrefour(codigo_barras):
     
     try:
         driver.get("https://www.carrefour.com.ar/")
-        time.sleep(2)
+        time.sleep(3)
         
         search_box = WebDriverWait(driver, 4).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5"))
