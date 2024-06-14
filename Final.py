@@ -200,7 +200,7 @@ def buscador_farmacity(codigo_barra):
         time.sleep(4)
 
         try:
-            not_found_element = driver.find_elements(By.CLASS_NAME, "farmacityar-store-components-1-x-notFoundText")
+            not_found_element = driver.find_elements(By.CLASS_NAME, "farmacityar-store-components-2-x-notFoundText")
             no_stock_element = driver.find_elements(By.CLASS_NAME, "farmacityar-store-components-1-x-no_stock")
 
             # Esperar a que se cargue la página de resultados
@@ -386,27 +386,27 @@ def procesar_archivo(archivo_excel):
         # Buscadores
         resultado_carrefour = buscador_carrefour(codigo)
         if resultado_carrefour["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Carrefour", resultado_carrefour["precio_actual"], resultado_carrefour["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-        
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Carrefour s/ Dto", resultado_carrefour["precio_anterior"], resultado_carrefour["precio_actual"]]], columns=df_resultados.columns)], ignore_index=True)
+            
         resultado_libertad = buscador_libertad(codigo)
         if resultado_libertad["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Libertad", resultado_libertad["precio_actual"], resultado_libertad["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-        
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Libertad s/ Dto", resultado_libertad["precio_anterior"], resultado_libertad["precio_actual"]]], columns=df_resultados.columns)], ignore_index=True)
+            
         resultado_superMami = buscador_superMami(codigo)
         if resultado_superMami["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Super Mami", resultado_superMami["precio_actual"], resultado_superMami["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-        
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Super Mami s/ Dto", resultado_superMami["precio_anterior"], resultado_superMami["precio_actual"]]], columns=df_resultados.columns)], ignore_index=True)
+            
         resultado_lider = buscador_lider(codigo)
         if resultado_lider["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Lider", resultado_lider["precio_actual"], resultado_lider["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-        
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Lider s/ Dto", resultado_lider["precio_anterior"], resultado_lider["precio_actual"]]], columns=df_resultados.columns)], ignore_index=True)
+            
         resultado_farmacity = buscador_farmacity(codigo)
         if resultado_farmacity["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Farmacity", resultado_farmacity["precio_actual"], resultado_farmacity["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Farmacity s/ Dto", resultado_farmacity["precio_anterior"], resultado_farmacity["precio_actual"]]], columns=df_resultados.columns)], ignore_index=True)
+            
         resultado_ferniplast = buscador_ferniplast(codigo)
         if resultado_ferniplast["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Ferniplast", resultado_ferniplast["precio_actual"], resultado_ferniplast["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Ferniplast s/ Dto", resultado_ferniplast["precio_anterior"], resultado_ferniplast["precio_actual"]]], columns=df_resultados.columns)], ignore_index=True)
 
 
     tiempo_total = time.time() - tiempo_inicio
@@ -422,14 +422,16 @@ def procesar_archivo(archivo_excel):
 
     # Especificar el orden deseado de las columnas
     column_order = [
-        "Código de Barras", "Producto", 
-        "Carrefour Precio", "Carrefour Precio s/ Dto", 
-        "Farmacity Precio", "Farmacity Precio s/ Dto", 
-        "Libertad Precio", "Libertad Precio s/ Dto", 
-        "Lider Precio", "Lider Precio s/ Dto", 
-        "Super Mami Precio", "Super Mami Precio s/ Dto",
-        "Ferniplast Precio", "Ferniplast Precio s/ Dto"
+        "Código de Barras", "Producto",
+        "Carrefour s/ Dto", "Carrefour $ c/u",
+        "Farmacity s/ Dto", "Farmacity $ c/u",
+        "Libertad s/ Dto", "Libertad $ c/u",
+        "Lider s/ Dto", "Lider $ c/u",
+        "Super Mami s/ Dto", "Super Mami $ c/u",
+        "Ferniplast s/ Dto", "Ferniplast $ c/u"
     ]
+
+
 
     # Reordenar las columnas
     df_resultados_pivot = df_resultados_pivot[column_order]
