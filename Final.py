@@ -490,7 +490,6 @@ def procesar_archivo(archivo_excel):
                 "Lider": executor.submit(buscador_lider, codigo),
                 "Farmacity": executor.submit(buscador_farmacity, codigo),
                 "Ferniplast": executor.submit(buscador_ferniplast, codigo),
-                "Disco": executor.submit(buscador_disco, codigo),
             }
             
             for sitio, future in sitios.items():
@@ -530,8 +529,7 @@ def procesar_archivo(archivo_excel):
         "Libertad Precio", "Libertad Precio s/ Dto", 
         "Super Mami Precio", "Super Mami Precio s/ Dto",
         "Lider Precio", "Lider Precio s/ Dto",
-        "Ferniplast Precio", "Ferniplast Precio s/ Dto", 
-        "Disco Precio", "Disco Precio s/ Dto"
+        "Ferniplast Precio", "Ferniplast Precio s/ Dto"
     ]
 
     # Reordenar las columnas
