@@ -15,64 +15,76 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
 sitios_busqueda = {
-    "Farmacity": False
+    "Carrefour": False
 }
 
-def buscador_farmacity(codigo_barra):
+def buscador_carrefour(codigo_barras):
     options = Options()
     options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
+    
     salida = {"producto": "Producto", "precio_actual": 0, "precio_anterior": 0}
-
+    
     try:
-        # Navegar a la página de Farmacity
-        driver.get("https://www.farmacity.com/")
-        campo_busqueda = WebDriverWait(driver, 4).until(
-            EC.visibility_of_element_located((By.ID, "downshift-0-input"))
+        driver.get("https://www.carrefour.com.ar/")
+        time.sleep(3)
+        
+        search_box = WebDriverWait(driver, 4).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5"))
         )
-        campo_busqueda.click()
-        campo_busqueda.send_keys(codigo_barra)
-        campo_busqueda.send_keys(Keys.RETURN)
-        time.sleep(4)
 
         try:
-            not_found_element = driver.find_elements(By.CLASS_NAME, "farmacityar-store-components-2-x-notFoundText")
-            no_stock_element = driver.find_elements(By.CLASS_NAME, "farmacityar-store-components-1-x-no_stock")
+            search_box.clear()
+            search_box.send_keys(codigo_barras)
+            search_box.send_keys(Keys.RETURN)
+            time.sleep(5)
+        
+        except StaleElementReferenceException:
+            search_box = driver.find_element(By.CSS_SELECTOR, "input.vtex-styleguide-9-x-input.ma0.border-box.vtex-styleguide-9-x-hideDecorators.vtex-styleguide-9-x-noAppearance.br2.br-0.br--left.w-100.bn.outline-0.bg-base.c-on-base.b--muted-4.hover-b--muted-3.t-body.pl5")
+            search_box.clear()
+            search_box.send_keys(codigo_barras)
+            search_box.send_keys(Keys.RETURN)
+            time.sleep(4)
 
-            # Esperar a que se cargue la página de resultados
-            if not_found_element:
-                # Producto no encontrado
-                pass
-            elif no_stock_element:
-                # Producto encontrado pero sin stock disponible
-                pass
-            else:
-                time.sleep(2)
-                precio_actual = WebDriverWait(driver, 4).until(
-                    EC.visibility_of_element_located((By.CSS_SELECTOR, "span.vtex-product-price-1-x-sellingPriceValue"))
+        driver.implicitly_wait(2)
+
+        try:
+            price_element = WebDriverWait(driver, 4).until(
+                EC.visibility_of_element_located((By.CSS_SELECTOR, "span.valtech-carrefourar-product-price-0-x-sellingPrice"))
+            )
+
+            try:
+                old_price_element = WebDriverWait(driver, 4).until(
+                    EC.visibility_of_element_located((By.CSS_SELECTOR, "span.valtech-carrefourar-product-price-0-x-listPrice"))
                 )
-                precio_completo = precio_actual.text
-
-                # Verificar si hay un precio sin descuento
-                precio_lista_element = driver.find_elements(By.CSS_SELECTOR, "span.vtex-product-price-1-x-listPriceValue.strike")
-                if precio_lista_element:
-                    precio_lista = precio_lista_element[0].text
-                    salida = {"producto": "Producto", "precio_actual": precio_completo, "precio_anterior": precio_lista}
-                else:
-                    # No hay precio con descuento disponible
-                    salida = {"producto": "Producto", "precio_actual": precio_completo, "precio_anterior": precio_completo}
+                
+                if price_element:
+                    price = price_element.get_attribute("textContent")
+                    old_price = old_price_element.get_attribute("textContent")
+                    salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": old_price}
+                    driver.quit()
+                    return salida
+                    
+            except TimeoutException:
+                price = price_element.get_attribute("textContent")
+                salida = {"producto": "Producto", "precio_actual": price, "precio_anterior": price}
+                driver.quit()
+                return salida
+                
+            
         except TimeoutException:
             pass
+                
     except Exception as e:
         # Error al conectar con la página web
         # Asegúrate de tener conexión a Internet y que la URL sea correcta.
-        print(f"Error en buscador_farmacity: {e}")
+        print(f"Error en buscador_carrefour: {e}")
         driver.quit()
         return {"producto": "Producto", "precio_actual": "error", "precio_anterior": "error"}
 
     driver.quit()
     return salida
-    
+
 def leer_codigos_desde_excel(archivo_excel):
     try:
         df = pd.read_excel(archivo_excel, header=None)
@@ -99,9 +111,9 @@ def procesar_archivo(archivo_excel):
     for i, (codigo, nombre_producto) in enumerate(zip(codigos_barra, nombres_productos), 1):
         print(f"Buscando productos para el código de barras: {codigo}")
         
-        resultado_farmacity = buscador_farmacity(codigo)
-        if resultado_farmacity["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Lider", resultado_farmacity["precio_actual"], resultado_farmacity["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+        resultado_carrefour = buscador_carrefour(codigo)
+        if resultado_carrefour["producto"]:
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Carrefour", resultado_carrefour["precio_actual"], resultado_carrefour["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
         
 
     tiempo_total = time.time() - tiempo_inicio
@@ -118,7 +130,7 @@ def procesar_archivo(archivo_excel):
     # Especificar el orden deseado de las columnas
     column_order = [
         "Código de Barras", "Producto", 
-        "Lider Precio", "Lider Precio s/ Dto"
+        "Carrefour Precio", "Carrefour Precio s/ Dto"
     ]
 
 

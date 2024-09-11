@@ -1,4 +1,5 @@
 import pandas as pd
+import customtkinter as ctk
 from tkinter import Tk, Button, Label, filedialog, Frame, N, S, E, W
 from tkinter.ttk import Style
 import time
@@ -13,6 +14,7 @@ from selenium.common.exceptions import TimeoutException, StaleElementReferenceEx
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
+import concurrent.futures
 
 # Definición de los sitios de búsqueda y sus funciones
 sitios_busqueda = {
@@ -466,6 +468,7 @@ def seleccionar_archivo():
     archivo_excel = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")])
     if archivo_excel:
         procesar_archivo(archivo_excel)
+import concurrent.futures
 
 def procesar_archivo(archivo_excel):
     codigos_barra, nombres_productos = leer_codigos_desde_excel(archivo_excel)
@@ -474,42 +477,42 @@ def procesar_archivo(archivo_excel):
     df_resultados = pd.DataFrame(columns=["Código de Barras", "Producto", "Sitio", "Precio", "Precio s/ Dto"])
     
     tiempo_inicio = time.time()
-    
+
+    # Función para buscar en todos los sitios simultáneamente
+    def buscar_en_sitios(codigo, nombre_producto):
+        resultados = []
+        
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            sitios = {
+                "Carrefour": executor.submit(buscador_carrefour, codigo),
+                "Libertad": executor.submit(buscador_libertad, codigo),
+                "Super Mami": executor.submit(buscador_superMami, codigo),
+                "Lider": executor.submit(buscador_lider, codigo),
+                "Farmacity": executor.submit(buscador_farmacity, codigo),
+                "Ferniplast": executor.submit(buscador_ferniplast, codigo),
+                "Disco": executor.submit(buscador_disco, codigo),
+            }
+            
+            for sitio, future in sitios.items():
+                resultado = future.result()
+                if resultado["producto"]:
+                    resultados.append([codigo, nombre_producto, sitio, resultado["precio_actual"], resultado["precio_anterior"]])
+        return resultados
+
+    # Procesar cada código de barras
     for i, (codigo, nombre_producto) in enumerate(zip(codigos_barra, nombres_productos), 1):
         print(f"Buscando productos para el código de barras: {codigo}")
         
-        # Buscadores
-        """ resultado_carrefour = buscador_carrefour(codigo)
-        if resultado_carrefour["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Carrefour", resultado_carrefour["precio_actual"], resultado_carrefour["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
+        # Buscar en todos los sitios en paralelo
+        resultados = buscar_en_sitios(codigo, nombre_producto)
         
-        resultado_libertad = buscador_libertad(codigo)
-        if resultado_libertad["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Libertad", resultado_libertad["precio_actual"], resultado_libertad["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-        
-        resultado_superMami = buscador_superMami(codigo)
-        if resultado_superMami["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Super Mami", resultado_superMami["precio_actual"], resultado_superMami["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-        
-        resultado_lider = buscador_lider(codigo)
-        if resultado_lider["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Lider", resultado_lider["precio_actual"], resultado_lider["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-        
-        resultado_farmacity = buscador_farmacity(codigo)
-        if resultado_farmacity["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Farmacity", resultado_farmacity["precio_actual"], resultado_farmacity["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-
-        resultado_ferniplast = buscador_ferniplast(codigo)
-        if resultado_ferniplast["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Ferniplast", resultado_ferniplast["precio_actual"], resultado_ferniplast["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
- """
-        resultado_disco = buscador_disco(codigo)
-        if resultado_disco["producto"]:
-            df_resultados = pd.concat([df_resultados, pd.DataFrame([[codigo, nombre_producto, "Disco", resultado_disco["precio_actual"], resultado_disco["precio_anterior"]]], columns=df_resultados.columns)], ignore_index=True)
-
+        # Agregar los resultados al DataFrame
+        for resultado in resultados:
+            df_resultados = pd.concat([df_resultados, pd.DataFrame([resultado], columns=df_resultados.columns)], ignore_index=True)
 
     tiempo_total = time.time() - tiempo_inicio
     print(f"Tiempo total de ejecución: {tiempo_total} segundos")
+
     # Pivotear el DataFrame para tener una fila por código de barras
     df_resultados_pivot = df_resultados.pivot(index=["Código de Barras", "Producto"], columns="Sitio", values=["Precio", "Precio s/ Dto"])
 
@@ -522,15 +525,14 @@ def procesar_archivo(archivo_excel):
     # Especificar el orden deseado de las columnas
     column_order = [
         "Código de Barras", "Producto", 
-        "Disco Precio", "Disco Precio s/ Dto"
-    ]
-    """ "Carrefour Precio", "Carrefour Precio s/ Dto", 
+        "Carrefour Precio", "Carrefour Precio s/ Dto", 
         "Farmacity Precio", "Farmacity Precio s/ Dto", 
         "Libertad Precio", "Libertad Precio s/ Dto", 
         "Super Mami Precio", "Super Mami Precio s/ Dto",
         "Lider Precio", "Lider Precio s/ Dto",
-        "Ferniplast Precio", "Ferniplast Precio s/ Dto", """
-
+        "Ferniplast Precio", "Ferniplast Precio s/ Dto", 
+        "Disco Precio", "Disco Precio s/ Dto"
+    ]
 
     # Reordenar las columnas
     df_resultados_pivot = df_resultados_pivot[column_order]
@@ -546,28 +548,24 @@ def procesar_archivo(archivo_excel):
     
     root.quit()  # Cerrar la aplicación de Tkinter
 
-# Configurar la ventana principal de Tkinter
-root = Tk()
+
+# Configurar la ventana principal con customtkinter
+root = ctk.CTk()  # Utilizamos CTk en lugar de Tk
 root.title("Cargador de Archivos Excel")
-root.geometry("300x180")
+root.geometry("400x150")
 root.resizable(False, False)
 
-# Estilo
-style = Style(root)
-style.theme_use('clam')
-style.configure("TButton", font=("Helvetica", 12), padding=10)
-style.configure("TLabel", font=("Helvetica", 12))
-
-# Marco para centrar contenido
-frame = Frame(root)
-frame.grid(row=0, column=0, padx=10, pady=10, sticky=(N, S, E, W))
+# Crear un marco para centrar contenido
+frame = ctk.CTkFrame(root)
+frame.pack(padx=0, pady=0, fill="both", expand=True)
 
 # Etiqueta
-label = Label(frame, text="Seleccione el archivo Excel con los códigos de barras")
-label.grid(row=0, column=0, columnspan=2, pady=20)
+label = ctk.CTkLabel(frame, text="Seleccione el archivo Excel con los códigos de barras", font=ctk.CTkFont(size=14))
+label.pack(pady=20)
 
 # Botón para cargar archivo
-boton = Button(frame, text="Cargar archivo", command=seleccionar_archivo)
-boton.grid(row=1, column=0, columnspan=2, pady=10)
+boton = ctk.CTkButton(frame, text="Cargar archivo", command=seleccionar_archivo)
+boton.pack(pady=10)
 
+# Ejecutar la ventana principal
 root.mainloop()

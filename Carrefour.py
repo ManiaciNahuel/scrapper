@@ -68,3 +68,4 @@ def buscador_carrefour(codigo_barras):
     driver.quit()
     return salida
     
+
