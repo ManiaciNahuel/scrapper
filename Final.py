@@ -290,7 +290,7 @@ def buscador_farmacity(codigo_barra):
         time.sleep(4)
 
         try:
-            not_found_element = driver.find_elements(By.CLASS_NAME, "farmacityar-store-components-2-x-notFoundText")
+            not_found_element = driver.find_elements(By.CLASS_NAME, "vtex-flex-layout-0-x-flexRow--search-not-found-title")
             no_stock_element = driver.find_elements(By.CLASS_NAME, "farmacityar-store-components-1-x-no_stock")
 
             # Esperar a que se cargue la página de resultados
